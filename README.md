@@ -1,59 +1,54 @@
-# ZohoPulse: B2B Lead-to-Cash Automation Engine
+# Zoho Automation Engine
 
-ZohoPulse is a full-stack enterprise automation suite integrating Zoho CRM and Zoho Books using proprietary Zoho Deluge scripting and REST APIs. The platform automates the end-to-end B2B revenue lifecycle from inbound lead ingestion and deduplication to automated opportunity conversion, sales qualification scoring, and Zoho Books invoice generation.
+Enterprise Lead-to-Cash automation system integrating Zoho CRM and Zoho Books using Zoho Deluge scripting and REST APIs.
 
----
+The engine automates revenue workflows including inbound lead deduplication, algorithmic lead qualification scoring, round-robin sales assignment, automated opportunity conversion, and Zoho Books invoice generation upon deal closing.
 
-## Architecture Overview
+## Architecture
 
-The system bridges customer acquisition and financial operations through an event-driven architecture powered by five production Zoho Deluge custom functions:
+The workflow connects CRM customer acquisition to financial accounting across five Deluge custom functions:
 
-1. Web-to-Lead Ingestion and Deduplication (1_lead_ingestion_and_dedup.dg):
-   Intercepts incoming lead payloads, normalizes contact data, and searches Zoho CRM by email and phone criteria to prevent duplicate clutter. Existing records are updated with activity timestamps; new records are created with initial tracking tags.
+1. Web-to-Lead Ingestion and Deduplication (1_lead_ingestion_and_dedup.dg)
+   Normalizes inbound contact information and queries Zoho CRM by email and phone using searchRecords to prevent duplicate entries. Existing contacts receive updated activity timestamps; new contacts are provisioned with attribution tags.
 
-2. Multi-Factor Qualification Scoring (2_ai_lead_scoring_and_assignment.dg):
-   Calculates an automated qualification score (0 to 100 points) based on annual revenue tiers, contact completeness, channel intent, and corporate domain verification. Implements a round-robin assignment algorithm distributing leads evenly across Account Executives.
+2. Lead Qualification Scoring and Rep Assignment (2_ai_lead_scoring_and_assignment.dg)
+   Scores incoming leads on a 0 to 100 point scale using enterprise revenue brackets, verified business email domains, and high-intent inbound channels. Qualified leads are distributed across Account Executives using modulo round-robin routing.
 
-3. Automated Lead-to-Deal Conversion (3_deal_conversion_workflow.dg):
-   Executes upon lead qualification, creating or linking an Account entity, generating an associated Contact, and opening a new Opportunity Deal in the CRM pipeline with calculated closing dates.
+3. Opportunity Conversion Workflow (3_deal_conversion_workflow.dg)
+   Converts sales-qualified leads into Zoho CRM Accounts, Contacts, and Opportunities with milestone closing dates and stage tracking.
 
-4. Deal-to-Invoice Generation (4_auto_invoice_generator_books.dg):
-   Triggers automatically when a deal transitions to "Closed Won". Calls zoho.books.createRecord() to generate an itemized invoice in Zoho Books, calculating subtotal, 16% corporate sales tax, and Net-15 payment terms before dispatching client notifications.
+4. Automated Invoicing in Zoho Books (4_auto_invoice_generator_books.dg)
+   Triggers when a CRM opportunity reaches Closed Won. Calls the Zoho Books API to generate an itemized invoice with line items, applicable sales tax, and Net-15 payment terms.
 
-5. Outbound Webhook Dispatcher (5_webhook_notification_dispatcher.dg):
-   Dispatches signed webhook event payloads to external enterprise portals using the Deluge invokeurl task, securing deliveries with HMAC-SHA256 signatures.
+5. Secure Webhook Notification Dispatcher (5_webhook_notification_dispatcher.dg)
+   Transmits signed JSON payloads to downstream systems and ERPs using the Deluge invokeurl task, authenticated via HMAC-SHA256 headers.
 
----
+## Tech Stack
 
-## Technical Stack
+- Backend: Python 3, FastAPI, Uvicorn
+- Cloud Scripting: Zoho Deluge 2.0 (CRM and Books tasks)
+- Authentication: Zoho Accounts OAuth 2.0 (Token refresh rotation)
+- APIs: Zoho CRM REST API v2, Zoho Books REST API v3
+- Frontend: HTML5, Tailwind CSS, Jinja2 Templates
 
-- Backend Engine: Python 3.12+ with FastAPI and Uvicorn
-- Cloud Scripting: Zoho Deluge 2.0 (CRM and Books built-in tasks)
-- Authentication: Zoho Accounts OAuth 2.0 (Authorization Code and Refresh Token rotation)
-- API Integration: Zoho CRM REST API v2, Zoho Books REST API v3
-- Frontend: Responsive HTML5 with Tailwind CSS and Jinja2 templating
-- Execution Telemetry: In-memory runtime logging with latency measurement in milliseconds
-
----
-
-## Project Structure
+## Directory Structure
 
 ```
-zohopulse-crm-engine/
+zoho-automation-engine/
 ├── app/
-│   ├── main.py              # FastAPI server routes, dashboard controllers, and API simulator
-│   ├── models.py            # Pydantic data schemas for Leads, Deals, Invoices, and Webhooks
-│   ├── deluge_engine.py     # Deluge execution engine with statement evaluation telemetry
-│   ├── zoho_client.py       # Zoho OAuth 2.0 manager and REST API v2 connector
+│   ├── main.py              # Application controllers, API routes, and simulator
+│   ├── models.py            # Data schemas for Leads, Deals, Invoices, Webhooks
+│   ├── deluge_engine.py     # Deluge execution runtime with latency tracking
+│   ├── zoho_client.py       # Zoho OAuth 2.0 manager and API client
 │   └── templates/
-│       ├── base.html        # Main layout with ecosystem navigation and token monitor
-│       ├── dashboard.html   # Executive KPI overview and pipeline metrics
-│       ├── leads.html       # CRM Leads catalog with scoring breakdowns
-│       ├── deals.html       # Deals Kanban pipeline with one-click conversion
-│       ├── invoices.html    # Itemized Zoho Books invoices
-│       ├── deluge_studio.html # Syntax-highlighted code inspector and sandbox runner
-│       ├── api_console.html # OAuth 2.0 token manager and REST API explorer
-│       └── interview_guide.html # Comprehensive Zoho technical interview guide
+│       ├── base.html        # Base navigation and OAuth token status
+│       ├── dashboard.html   # Pipeline overview and funnel metrics
+│       ├── leads.html       # CRM Lead management and scoring table
+│       ├── deals.html       # Opportunity pipeline
+│       ├── invoices.html    # Generated Zoho Books invoices
+│       ├── deluge_studio.html # Deluge code inspector and test runner
+│       ├── api_console.html # OAuth token manager and REST explorer
+│       └── interview_guide.html # Technical reference and architectural Q&A
 ├── scripts/
 │   └── deluge/
 │       ├── 1_lead_ingestion_and_dedup.dg
@@ -61,33 +56,59 @@ zohopulse-crm-engine/
 │       ├── 3_deal_conversion_workflow.dg
 │       ├── 4_auto_invoice_generator_books.dg
 │       └── 5_webhook_notification_dispatcher.dg
-├── run.py                   # Server startup script
+├── requirements.txt
+├── run.py
 └── README.md
 ```
 
----
+## Installation and Setup
 
-## Setup and Execution
+### Prerequisites
 
-1. Navigate to the project directory:
-   cd /home/kali/Projects/zohopulse-crm-engine
+- Python 3.10 or higher
+- Git
 
-2. Launch the application:
-   /home/kali/Projects/talentpulse-ai/venv/bin/python run.py
+### Quickstart
 
-3. Open the platform in your browser:
+1. Clone the repository:
+   ```bash
+   git clone git@github.com:hamzaihsan9/zoho-automation-engine.git
+   cd zoho-automation-engine
+   ```
+
+2. Create a virtual environment and install dependencies:
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   pip install -r requirements.txt
+   ```
+
+3. Start the application:
+   ```bash
+   python run.py
+   ```
+
+4. Access the web interface at:
    http://localhost:8090
 
-4. Key Navigation Endpoints:
-   - Dashboard: http://localhost:8090/
-   - Leads and Scoring: http://localhost:8090/leads
-   - Deals Pipeline: http://localhost:8090/deals
-   - Zoho Books Invoices: http://localhost:8090/invoices
-   - Deluge Script Studio: http://localhost:8090/deluge-studio
-   - API and OAuth Console: http://localhost:8090/api-console
-   - Interview Preparation Guide: http://localhost:8090/interview-guide
+## Modules and Routes
 
----
+- Dashboard: http://localhost:8090/
+- Leads and Scoring: http://localhost:8090/leads
+- Deals Pipeline: http://localhost:8090/deals
+- Zoho Books Invoices: http://localhost:8090/invoices
+- Deluge Script Studio: http://localhost:8090/deluge-studio
+- API and OAuth Console: http://localhost:8090/api-console
+- Interview Technical Guide: http://localhost:8090/interview-guide
+
+## Deluge Script Deployment
+
+To deploy these functions in a live Zoho environment:
+
+1. Navigate to Zoho CRM Setup > Developer Hub > Functions.
+2. Create a new function, select Deluge as the language, and paste the code from scripts/deluge/.
+3. Configure Workflow Rules or Webhooks to trigger the functions on record create or stage transition events.
+4. For Zoho Books integration, ensure your Zoho CRM - Zoho Books integration connection is authorized with the ZohoBooks.invoices.CREATE scope.
 
 ## License
 
