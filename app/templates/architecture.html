@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}System Architecture &amp; Integration Guide | ZohoPulse{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+
+    <!-- Top Architecture Banner (Borderless) -->
+    <div class="bg-gradient-to-r from-slate-900 via-[#1e293b] to-slate-900 text-white p-8 sm:p-10 rounded-3xl shadow-md border-none space-y-3">
+        <div class="inline-flex items-center gap-2 bg-blue-500/20 text-blue-300 px-3.5 py-1 rounded-full text-xs font-bold">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            <span>Platform Technical Specifications &bull; Version 2.4</span>
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white leading-tight">
+            Zoho Lead-to-Cash Technical Architecture &amp; Runbook
+        </h1>
+        <p class="text-sm text-slate-300 font-semibold max-w-3xl leading-relaxed">
+            Comprehensive system documentation covering event-driven Deluge automation scripts, OAuth 2.0 multi-datacenter security lifecycle, CRM entity relationships, and automated Zoho Books financial reconciliation.
+        </p>
+    </div>
+
+    <!-- Executive Architecture Summary -->
+    <div class="bg-white p-8 rounded-3xl shadow-sm border-none space-y-4">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            </div>
+            <div>
+                <h3 class="text-xl font-extrabold text-slate-900">Executive Architecture Summary</h3>
+                <p class="text-xs text-slate-500 font-bold">End-to-End revenue workflow synchronization</p>
+            </div>
+        </div>
+
+        <div class="bg-slate-50 p-6 rounded-2xl text-xs font-semibold text-slate-700 leading-relaxed space-y-3">
+            <p>
+                <strong>ZohoPulse</strong> is an enterprise revenue automation platform that bridges top-of-funnel customer acquisition in <strong>Zoho CRM</strong> with automated financial billing in <strong>Zoho Books</strong> using serverless <strong>Zoho Deluge</strong> custom functions and REST APIs.
+            </p>
+            <p>
+                The platform executes a five-stage automated pipeline:
+            </p>
+            <ol class="list-decimal pl-5 space-y-1.5 text-slate-800 font-bold">
+                <li><strong>Idempotent Ingestion &amp; Deduplication:</strong> Normalizes incoming payloads and queries CRM records by email and phone using searchRecords to prevent record proliferation.</li>
+                <li><strong>Multi-Factor Qualification Scoring:</strong> Evaluates revenue brackets, corporate domain validity, and inbound channel intent, routing sales-qualified prospects via modulo round-robin.</li>
+                <li><strong>Automated Opportunity Conversion:</strong> Atomically creates linked Account, Contact, and Opportunity records with calculated closing milestones.</li>
+                <li><strong>Accounts Receivable Generation:</strong> Listens for Closed-Won transitions and invokes Zoho Books to produce itemized, tax-calculated invoices with Net-15 terms.</li>
+                <li><strong>Cryptographic Webhook Dispatch:</strong> Secures outbound event propagation to external warehouse and ERP endpoints using HMAC-SHA256 signatures via invokeurl.</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Core Technical Specifications & Architecture FAQ -->
+    <div class="bg-white p-8 rounded-3xl shadow-sm border-none space-y-6">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+            </div>
+            <div>
+                <h3 class="text-xl font-extrabold text-slate-900">Core Engineering Specifications</h3>
+                <p class="text-xs text-slate-500 font-bold">In-depth technical architecture and system governance</p>
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            
+            <!-- Item 1 -->
+            <div class="p-6 rounded-2xl bg-[#f8fafc] space-y-2 border-none">
+                <h4 class="text-sm font-extrabold text-slate-900">
+                    1. Deluge Cloud Grid Runtime &amp; Comparison with Traditional Runtimes
+                </h4>
+                <p class="text-xs text-slate-600 font-semibold leading-relaxed">
+                    Deluge (Data Enriched Language for the Universal Grid Environment) is Zoho's proprietary domain-specific scripting language running on Zoho's cloud grid. Unlike general-purpose languages, Deluge features native built-in integration tasks for the entire Zoho ecosystem (zoho.crm.*, zoho.books.*, zoho.desk.*). This eliminates HTTP wrappers, authorization header management, and manual JSON parsing, reducing boilerplate while executing safely within multi-tenant sandboxes.
+                </p>
+            </div>
+
+            <!-- Item 2 -->
+            <div class="p-6 rounded-2xl bg-[#f8fafc] space-y-2 border-none">
+                <h4 class="text-sm font-extrabold text-slate-900">
+                    2. Zoho OAuth 2.0 Security Architecture &amp; Multi-Datacenter Lifecycle
+                </h4>
+                <p class="text-xs text-slate-600 font-semibold leading-relaxed">
+                    Zoho requires OAuth 2.0 with scoped access across multi-region datacenters (.com, .eu, .in, .com.au, .com.cn, .jp). Applications register client credentials in the Zoho Developer Console and exchange grant codes for a persistent Refresh Token and a 1-hour Access Token. All API requests pass Authorization: Zoho-oauthtoken &lt;access_token&gt;. ZohoPulse implements proactive token renewal when remaining TTL falls below 300 seconds.
+                </p>
+            </div>
+
+            <!-- Item 3 -->
+            <div class="p-6 rounded-2xl bg-[#f8fafc] space-y-2 border-none">
+                <h4 class="text-sm font-extrabold text-slate-900">
+                    3. Zoho CRM REST API v2 vs v3 Architectural Enhancements
+                </h4>
+                <p class="text-xs text-slate-600 font-semibold leading-relaxed">
+                    API v3 enforces strict JSON schema typing, enhanced composite criteria search, field-level permissions, and granular multi-currency support. v3 additionally introduces bulk read/write endpoints capable of processing 25,000 records per job asynchronously via CSV streaming, mitigating synchronous timeout ceilings.
+                </p>
+            </div>
+
+            <!-- Item 4 -->
+            <div class="p-6 rounded-2xl bg-[#f8fafc] space-y-2 border-none">
+                <h4 class="text-sm font-extrabold text-slate-900">
+                    4. Execution Limits, Rate-Limit Governance &amp; Backoff Strategies
+                </h4>
+                <p class="text-xs text-slate-600 font-semibold leading-relaxed">
+                    Deluge enforces runtime constraints: 5,000 statements per custom function execution, 250 invokeurl calls per day per org in free tiers, and strict memory allocations. ZohoPulse adheres to these limits by utilizing batch operations (createRecords with up to 100 entries per payload), indexing criteria filters on indexed fields, and implementing exponential backoff with jitter on HTTP 429 Too Many Requests responses.
+                </p>
+            </div>
+
+            <!-- Item 5 -->
+            <div class="p-6 rounded-2xl bg-[#f8fafc] space-y-2 border-none">
+                <h4 class="text-sm font-extrabold text-slate-900">
+                    5. Programmatic Lead-to-Opportunity Transaction Mechanics
+                </h4>
+                <p class="text-xs text-slate-600 font-semibold leading-relaxed">
+                    Converting a lead involves an atomic transition: the lead entity is archived, creating an Account entity (the enterprise organisation), a primary Contact record, and a Deal record in the active sales pipeline. In Deluge, this is orchestrated via zoho.crm.convertLead(leadId, conversionMap) ensuring transactional integrity without orphaned records.
+                </p>
+            </div>
+
+            <!-- Item 6 -->
+            <div class="p-6 rounded-2xl bg-[#f8fafc] space-y-2 border-none">
+                <h4 class="text-sm font-extrabold text-slate-900">
+                    6. Cryptographic Webhook Security (HMAC-SHA256 via invokeurl)
+                </h4>
+                <p class="text-xs text-slate-600 font-semibold leading-relaxed">
+                    To safeguard outbound communication, Deluge's invokeurl task dispatches JSON payloads accompanied by an X-Zoho-Signature header generated using HMAC-SHA256 over the payload body and a shared secret key. Recipient enterprise servers verify the cryptographic signature before acknowledging processing, neutralizing man-in-the-middle or spoofing vulnerabilities.
+                </p>
+            </div>
+
+            <!-- Item 7 -->
+            <div class="p-6 rounded-2xl bg-[#f8fafc] space-y-2 border-none">
+                <h4 class="text-sm font-extrabold text-slate-900">
+                    7. Event-Driven Architecture: Custom Functions vs. Workflow Rules vs. Blueprints
+                </h4>
+                <p class="text-xs text-slate-600 font-semibold leading-relaxed">
+                    Workflow Rules trigger asynchronous actions on record creation, modification, or date conditions. Custom Functions run arbitrary Deluge code for cross-module or third-party logic. Blueprints represent formal state machines with strictly enforced transitions, during which users or automated triggers must satisfy validation criteria before advancing pipeline stages.
+                </p>
+            </div>
+
+            <!-- Item 8 -->
+            <div class="p-6 rounded-2xl bg-[#f8fafc] space-y-2 border-none">
+                <h4 class="text-sm font-extrabold text-slate-900">
+                    8. Idempotent Ingestion &amp; Composite Deduplication Strategy
+                </h4>
+                <p class="text-xs text-slate-600 font-semibold leading-relaxed">
+                    Prior to record insertion, the system executes composite searches using zoho.crm.searchRecords("Leads", criteriaQuery). If a record with matching normalized email or sanitized phone exists, Deluge updates existing activity attributes rather than provisioning duplicate records, maintaining clean CRM data hygiene.
+                </p>
+            </div>
+
+            <!-- Item 9 -->
+            <div class="p-6 rounded-2xl bg-[#f8fafc] space-y-2 border-none">
+                <h4 class="text-sm font-extrabold text-slate-900">
+                    9. Cross-Application Entity Relationship Model (CRM to Finance)
+                </h4>
+                <p class="text-xs text-slate-600 font-semibold leading-relaxed">
+                    A Zoho CRM Account maps directly to a Zoho Books Customer (Contact entity in Books). CRM Deals map to Sales Orders or directly to Invoices. Line items in Deals reference Zoho Books Pricebooks or Products via standardized SKU codes, ensuring that when Deals reach Closed Won, invoices accurately mirror contract specifications.
+                </p>
+            </div>
+
+            <!-- Item 10 -->
+            <div class="p-6 rounded-2xl bg-[#f8fafc] space-y-2 border-none">
+                <h4 class="text-sm font-extrabold text-slate-900">
+                    10. Zoho Books Multi-Jurisdiction Tax &amp; Itemized Billing Calculations
+                </h4>
+                <p class="text-xs text-slate-600 font-semibold leading-relaxed">
+                    When invoking zoho.books.createRecord("Invoices", orgId, invoiceMap), line items are submitted with unit rates, quantities, and tax_id identifiers. Zoho Books computes line-level and compound sales taxes, calculates payment due dates based on customer payment terms (e.g. Net 15, Net 30), generates PDF invoices, and tracks payment reconciliation across payment gateways.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

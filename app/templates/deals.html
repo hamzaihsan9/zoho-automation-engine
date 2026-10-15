@@ -1,165 +1,173 @@
 {% extends "base.html" %}
 
-{% block title %}Deals Pipeline & Invoicing | ZohoPulse{% endblock %}
+{% block title %}Deals Pipeline | ZohoPulse Enterprise{% endblock %}
 
 {% block content %}
 <div class="space-y-6">
 
-    <!-- Top Action Bar -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm">
+    <!-- Top Action Bar (Borderless) -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-8 rounded-3xl shadow-sm border-none">
         <div>
-            <h1 class="text-2xl font-black text-slate-900">Zoho CRM Deals & Opportunities</h1>
-            <p class="text-xs text-slate-500 font-medium mt-0.5">
-                Moving a deal to <strong class="text-emerald-700">"Closed Won"</strong> executes <code class="bg-slate-100 text-blue-700 font-mono px-1.5 py-0.5 rounded">4_auto_invoice_generator_books.dg</code>
+            <div class="inline-flex items-center gap-2 bg-amber-50 text-amber-800 text-[11px] font-bold px-3 py-1 rounded-full uppercase mb-2">
+                Zoho CRM Opportunity Pipeline
+            </div>
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Enterprise Deals Pipeline</h1>
+            <p class="text-xs text-slate-500 font-bold mt-1">
+                Advancing an opportunity to <strong class="text-emerald-700">Closed Won</strong> triggers automated invoice generation and tax calculation in Zoho Books
             </p>
         </div>
-        <div class="flex items-center gap-2">
-            <span class="text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-xl">
-                Pipeline Value: <strong>${{ "{:,.0f}".format(total_pipeline_val) }}</strong>
-            </span>
+        <div class="flex items-center gap-3">
+            <div class="bg-slate-100 px-4 py-2.5 rounded-2xl text-xs font-bold text-slate-700">
+                Total Pipeline Value: <strong class="text-slate-900">${{ "{:,.0f}".format(total_pipeline_val) }}</strong>
+            </div>
         </div>
     </div>
 
-    <!-- Deals Grid by Pipeline Stages -->
+    <!-- Deals Grid by Pipeline Stages (Borderless, Spacious Kanban) -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         
         <!-- Stage 1: Proposal / Value Proposition -->
-        <div class="bg-slate-100/70 p-5 rounded-3xl space-y-4 border border-slate-200/60">
-            <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+        <div class="bg-[#eef2f6] p-6 rounded-3xl space-y-4 border-none">
+            <div class="flex items-center justify-between pb-2">
                 <div class="flex items-center gap-2">
-                    <span class="w-3 h-3 rounded-full bg-blue-500"></span>
-                    <h3 class="font-bold text-sm text-slate-800">Proposal Stage</h3>
+                    <span class="w-3 h-3 rounded-full bg-blue-600"></span>
+                    <h3 class="font-extrabold text-sm text-slate-900">Proposal Stage</h3>
                 </div>
-                <span class="text-xs font-bold text-slate-500 bg-white px-2 py-0.5 rounded-full shadow-sm">
+                <span class="text-xs font-bold text-slate-600 bg-white px-3 py-1 rounded-full shadow-sm">
                     {{ deals|selectattr("stage", "equalto", "Proposal / Value Proposition")|list|length }}
                 </span>
             </div>
 
-            <div class="space-y-3">
+            <div class="space-y-4">
                 {% for deal in deals if deal.stage == "Proposal / Value Proposition" %}
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 space-y-3">
-                    <div>
-                        <span class="font-mono text-[10px] text-slate-400">#{{ deal.id }}</span>
-                        <h4 class="font-black text-sm text-slate-900">{{ deal.deal_name }}</h4>
-                        <p class="text-xs text-slate-500 mt-0.5">{{ deal.account_name }} • {{ deal.contact_name }}</p>
-                    </div>
-
-                    <div class="flex items-baseline justify-between pt-2 border-t border-slate-100">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border-none space-y-4">
+                    <div class="flex items-start justify-between gap-2">
                         <div>
-                            <span class="text-xs text-slate-400 block font-medium">Value</span>
-                            <span class="text-base font-black text-slate-900">${{ "{:,.0f}".format(deal.amount) }}</span>
+                            <span class="font-mono text-[10px] text-slate-400 font-bold block">OPP-{{ deal.id }}</span>
+                            <h4 class="font-extrabold text-base text-slate-900 leading-snug">{{ deal.deal_name }}</h4>
+                            <p class="text-xs text-slate-500 font-bold mt-1">{{ deal.account_name }} &bull; {{ deal.contact_name }}</p>
                         </div>
-                        <span class="text-[11px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
-                            {{ deal.probability }}% Prob.
+                        <span class="text-[11px] font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg shrink-0">
+                            {{ deal.probability }}%
                         </span>
                     </div>
 
+                    <div class="pt-3 border-t border-slate-100 flex items-baseline justify-between">
+                        <div>
+                            <span class="text-[11px] text-slate-400 font-bold block">Contract Value</span>
+                            <span class="text-xl font-extrabold text-slate-900">${{ "{:,.0f}".format(deal.amount) }}</span>
+                        </div>
+                        <span class="text-[11px] text-slate-400 font-bold">Close: {{ deal.closing_date }}</span>
+                    </div>
+
                     <div class="pt-2 flex items-center justify-between">
-                        <span class="text-[10px] font-semibold text-slate-500">Rep: {{ deal.owner.split('(')[0] }}</span>
+                        <span class="text-xs font-bold text-slate-500">Rep: {{ deal.owner.split('(')[0].strip() }}</span>
                         <form action="/api/deals/{{ deal.id }}/close-won" method="POST">
-                            <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs shadow flex items-center gap-1 transition-transform transform hover:-translate-y-0.5">
-                                <span>Mark Closed Won</span>
-                                <span>🏆</span>
+                            <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs shadow-sm transition-all transform hover:-translate-y-0.5">
+                                Close Won &rarr;
                             </button>
                         </form>
                     </div>
                 </div>
                 {% else %}
-                <div class="text-center py-8 text-xs text-slate-400">No deals in Proposal stage</div>
+                <div class="text-center py-12 text-xs font-bold text-slate-400">No active deals in Proposal stage</div>
                 {% endfor %}
             </div>
         </div>
 
         <!-- Stage 2: Negotiation / Review -->
-        <div class="bg-slate-100/70 p-5 rounded-3xl space-y-4 border border-slate-200/60">
-            <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+        <div class="bg-[#eef2f6] p-6 rounded-3xl space-y-4 border-none">
+            <div class="flex items-center justify-between pb-2">
                 <div class="flex items-center gap-2">
                     <span class="w-3 h-3 rounded-full bg-amber-500"></span>
-                    <h3 class="font-bold text-sm text-slate-800">Negotiation Stage</h3>
+                    <h3 class="font-extrabold text-sm text-slate-900">Negotiation Stage</h3>
                 </div>
-                <span class="text-xs font-bold text-slate-500 bg-white px-2 py-0.5 rounded-full shadow-sm">
+                <span class="text-xs font-bold text-slate-600 bg-white px-3 py-1 rounded-full shadow-sm">
                     {{ deals|selectattr("stage", "equalto", "Negotiation / Review")|list|length }}
                 </span>
             </div>
 
-            <div class="space-y-3">
+            <div class="space-y-4">
                 {% for deal in deals if deal.stage == "Negotiation / Review" %}
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 space-y-3">
-                    <div>
-                        <span class="font-mono text-[10px] text-slate-400">#{{ deal.id }}</span>
-                        <h4 class="font-black text-sm text-slate-900">{{ deal.deal_name }}</h4>
-                        <p class="text-xs text-slate-500 mt-0.5">{{ deal.account_name }} • {{ deal.contact_name }}</p>
-                    </div>
-
-                    <div class="flex items-baseline justify-between pt-2 border-t border-slate-100">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border-none space-y-4">
+                    <div class="flex items-start justify-between gap-2">
                         <div>
-                            <span class="text-xs text-slate-400 block font-medium">Value</span>
-                            <span class="text-base font-black text-slate-900">${{ "{:,.0f}".format(deal.amount) }}</span>
+                            <span class="font-mono text-[10px] text-slate-400 font-bold block">OPP-{{ deal.id }}</span>
+                            <h4 class="font-extrabold text-base text-slate-900 leading-snug">{{ deal.deal_name }}</h4>
+                            <p class="text-xs text-slate-500 font-bold mt-1">{{ deal.account_name }} &bull; {{ deal.contact_name }}</p>
                         </div>
-                        <span class="text-[11px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded">
-                            {{ deal.probability }}% Prob.
+                        <span class="text-[11px] font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg shrink-0">
+                            {{ deal.probability }}%
                         </span>
                     </div>
 
+                    <div class="pt-3 border-t border-slate-100 flex items-baseline justify-between">
+                        <div>
+                            <span class="text-[11px] text-slate-400 font-bold block">Contract Value</span>
+                            <span class="text-xl font-extrabold text-slate-900">${{ "{:,.0f}".format(deal.amount) }}</span>
+                        </div>
+                        <span class="text-[11px] text-slate-400 font-bold">Close: {{ deal.closing_date }}</span>
+                    </div>
+
                     <div class="pt-2 flex items-center justify-between">
-                        <span class="text-[10px] font-semibold text-slate-500">Rep: {{ deal.owner.split('(')[0] }}</span>
+                        <span class="text-xs font-bold text-slate-500">Rep: {{ deal.owner.split('(')[0].strip() }}</span>
                         <form action="/api/deals/{{ deal.id }}/close-won" method="POST">
-                            <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs shadow flex items-center gap-1 transition-transform transform hover:-translate-y-0.5">
-                                <span>Mark Closed Won</span>
-                                <span>🏆</span>
+                            <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs shadow-sm transition-all transform hover:-translate-y-0.5">
+                                Close Won &rarr;
                             </button>
                         </form>
                     </div>
                 </div>
                 {% else %}
-                <div class="text-center py-8 text-xs text-slate-400">No deals in Negotiation stage</div>
+                <div class="text-center py-12 text-xs font-bold text-slate-400">No active deals in Negotiation stage</div>
                 {% endfor %}
             </div>
         </div>
 
         <!-- Stage 3: Closed Won (Invoiced via Zoho Books) -->
-        <div class="bg-emerald-50/60 p-5 rounded-3xl space-y-4 border border-emerald-200/60">
-            <div class="flex items-center justify-between pb-2 border-b border-emerald-200">
+        <div class="bg-[#eef2f6] p-6 rounded-3xl space-y-4 border-none">
+            <div class="flex items-center justify-between pb-2">
                 <div class="flex items-center gap-2">
-                    <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
-                    <h3 class="font-bold text-sm text-emerald-950">Closed Won (Auto-Invoiced)</h3>
+                    <span class="w-3 h-3 rounded-full bg-emerald-600"></span>
+                    <h3 class="font-extrabold text-sm text-slate-900">Closed Won (Invoiced)</h3>
                 </div>
-                <span class="text-xs font-bold text-emerald-800 bg-white px-2 py-0.5 rounded-full shadow-sm">
+                <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full shadow-sm">
                     {{ deals|selectattr("stage", "equalto", "Closed Won")|list|length }}
                 </span>
             </div>
 
-            <div class="space-y-3">
+            <div class="space-y-4">
                 {% for deal in deals if deal.stage == "Closed Won" %}
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-emerald-100 space-y-3">
-                    <div class="flex items-start justify-between">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border-none space-y-4">
+                    <div class="flex items-start justify-between gap-2">
                         <div>
-                            <span class="font-mono text-[10px] text-slate-400">#{{ deal.id }}</span>
-                            <h4 class="font-black text-sm text-slate-900">{{ deal.deal_name }}</h4>
-                            <p class="text-xs text-slate-500 mt-0.5">{{ deal.account_name }}</p>
+                            <span class="font-mono text-[10px] text-emerald-600 font-bold block">OPP-{{ deal.id }}</span>
+                            <h4 class="font-extrabold text-base text-slate-900 leading-snug">{{ deal.deal_name }}</h4>
+                            <p class="text-xs text-slate-500 font-bold mt-1">{{ deal.account_name }} &bull; {{ deal.contact_name }}</p>
                         </div>
-                        <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                            100% Won ✓
+                        <span class="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-lg shrink-0">
+                            100% Won
                         </span>
                     </div>
 
-                    <div class="flex items-baseline justify-between pt-2 border-t border-slate-100">
+                    <div class="pt-3 border-t border-slate-100 flex items-baseline justify-between">
                         <div>
-                            <span class="text-xs text-slate-400 block font-medium">Won Value</span>
-                            <span class="text-base font-black text-emerald-700">${{ "{:,.0f}".format(deal.amount) }}</span>
+                            <span class="text-[11px] text-slate-400 font-bold block">Final Realized Value</span>
+                            <span class="text-xl font-extrabold text-emerald-700">${{ "{:,.0f}".format(deal.amount) }}</span>
                         </div>
-                        {% if deal.invoice_number %}
-                        <div class="text-right">
-                            <span class="text-[10px] text-slate-400 block font-medium">Zoho Books Invoice</span>
-                            <a href="/invoices" class="font-mono text-xs font-bold text-blue-600 hover:underline">
-                                {{ deal.invoice_number }} 📄
-                            </a>
-                        </div>
-                        {% endif %}
+                        <span class="text-[11px] text-slate-400 font-bold">Won: {{ deal.closing_date }}</span>
+                    </div>
+
+                    <div class="pt-2 flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-500">Rep: {{ deal.owner.split('(')[0].strip() }}</span>
+                        <a href="/invoices" class="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                            <span>View Invoice</span>
+                            <span>&rarr;</span>
+                        </a>
                     </div>
                 </div>
                 {% else %}
-                <div class="text-center py-8 text-xs text-slate-400">No Closed Won deals yet</div>
+                <div class="text-center py-12 text-xs font-bold text-slate-400">No deals closed won yet</div>
                 {% endfor %}
             </div>
         </div>

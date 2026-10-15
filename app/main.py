@@ -162,11 +162,15 @@ async def api_console_view(request: Request, endpoint: str = "crm_leads"):
         "api_json_pretty": json.dumps(data_payload, indent=2, default=str)
     })
 
-@app.get("/interview-guide", response_class=HTMLResponse)
-async def interview_guide_view(request: Request):
-    return templates.TemplateResponse(request=request, name="interview_guide.html", context={
-        "active_tab": "interview"
+@app.get("/architecture", response_class=HTMLResponse)
+async def architecture_view(request: Request):
+    return templates.TemplateResponse(request=request, name="architecture.html", context={
+        "active_tab": "architecture"
     })
+
+@app.get("/interview-guide")
+async def interview_guide_redirect():
+    return RedirectResponse(url="/architecture", status_code=301)
 
 # ==============================================================================
 # ACTION API ENDPOINTS

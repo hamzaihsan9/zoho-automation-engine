@@ -16,6 +16,6 @@ if __name__ == "__main__":
     print(" Running on: http://localhost:8090")
     print(" Deluge Studio: http://localhost:8090/deluge-studio")
     print(" API Console: http://localhost:8090/api-console")
-    print(" Interview Guide: http://localhost:8090/interview-guide")
+    print(" Architecture & Docs: http://localhost:8090/architecture")
     print("==================================================================")
     uvicorn.run("app.main:app", host="0.0.0.0", port=8090, reload=False, log_level="info")

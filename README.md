@@ -48,7 +48,7 @@ zoho-automation-engine/
 │       ├── invoices.html    # Generated Zoho Books invoices
 │       ├── deluge_studio.html # Deluge code inspector and test runner
 │       ├── api_console.html # OAuth token manager and REST explorer
-│       └── interview_guide.html # Technical reference and architectural Q&A
+│       └── architecture.html # Technical reference and architectural specifications
 ├── scripts/
 │   └── deluge/
 │       ├── 1_lead_ingestion_and_dedup.dg
@@ -99,7 +99,7 @@ zoho-automation-engine/
 - Zoho Books Invoices: http://localhost:8090/invoices
 - Deluge Script Studio: http://localhost:8090/deluge-studio
 - API and OAuth Console: http://localhost:8090/api-console
-- Interview Technical Guide: http://localhost:8090/interview-guide
+- System Architecture and Docs: http://localhost:8090/architecture
 
 ## Deluge Script Deployment
 

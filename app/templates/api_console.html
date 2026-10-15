@@ -1,65 +1,68 @@
 {% extends "base.html" %}
 
-{% block title %}Zoho REST API & OAuth 2.0 Console | ZohoPulse{% endblock %}
+{% block title %}Zoho REST API &amp; OAuth 2.0 Console | ZohoPulse{% endblock %}
 
 {% block content %}
 <div class="space-y-6">
 
-    <!-- Top Action Bar -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm">
+    <!-- Top Action Bar (Borderless) -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-8 rounded-3xl shadow-sm border-none">
         <div>
-            <div class="inline-flex items-center gap-2 bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase mb-1">
+            <div class="inline-flex items-center gap-2 bg-blue-50 text-blue-700 text-[11px] font-bold px-3 py-1 rounded-full uppercase mb-2">
                 Developer Integration Hub
             </div>
-            <h1 class="text-2xl font-black text-slate-900">Zoho REST API v2 & OAuth 2.0 Console</h1>
-            <p class="text-xs text-slate-500 font-medium">
-                Live inspection of Zoho Accounts OAuth token rotation, scopes, rate limits, and raw JSON endpoints.
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Zoho REST API v2 &amp; OAuth 2.0 Console</h1>
+            <p class="text-xs text-slate-500 font-bold mt-1">
+                Live inspection of Zoho Accounts OAuth token rotation, scopes, rate limits, and raw JSON endpoints
             </p>
         </div>
         <form action="/api/oauth/refresh" method="POST">
-            <button type="submit" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow">
-                <span>🔄 Force OAuth2 Token Refresh</span>
+            <button type="submit" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-5 py-3 rounded-2xl text-xs flex items-center gap-2 shadow transition-all transform hover:-translate-y-0.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                <span>Force Token Refresh</span>
             </button>
         </form>
     </div>
 
-    <!-- OAuth 2.0 Token Details Card -->
-    <div class="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/80 shadow-sm space-y-4">
-        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-            <div class="flex items-center gap-2.5">
-                <span class="text-xl">🔐</span>
+    <!-- OAuth 2.0 Token Details Card (Borderless, Airy) -->
+    <div class="bg-white p-8 rounded-3xl shadow-sm border-none space-y-6">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                </div>
                 <div>
-                    <h3 class="font-black text-base text-slate-900">Zoho Accounts OAuth 2.0 Token Manager</h3>
-                    <p class="text-xs text-slate-500">Auto-refreshed via refresh token when within 5 minutes of expiration</p>
+                    <h3 class="font-extrabold text-lg text-slate-900">Zoho Accounts OAuth 2.0 Token Manager</h3>
+                    <p class="text-xs text-slate-500 font-bold">Auto-refreshed via refresh token when within 5 minutes of expiration</p>
                 </div>
             </div>
-            <span class="bg-emerald-100 text-emerald-800 font-bold text-xs px-3 py-1 rounded-full">
-                Token Active ✓
+            <span class="bg-emerald-100 text-emerald-800 font-bold text-xs px-3.5 py-1 rounded-full">
+                Token Active &bull; Verified
             </span>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/60">
-                <span class="text-[10px] font-bold text-slate-400 uppercase block">Active Access Token (Bearer)</span>
-                <span class="font-mono text-slate-800 font-bold break-all block mt-1 select-all">{{ token_info.access_token }}</span>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
+            <div class="bg-slate-50 p-6 rounded-2xl space-y-2 border-none">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Active Access Token (Bearer)</span>
+                <span class="font-mono text-slate-800 font-bold break-all block select-all text-xs leading-relaxed">{{ token_info.access_token }}</span>
             </div>
-            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/60">
-                <span class="text-[10px] font-bold text-slate-400 uppercase block">Token Lifetime & Expiry</span>
-                <span class="text-lg font-black text-slate-900 block mt-1">{{ token_info.expires_in_seconds }}s remaining</span>
-                <span class="text-[10px] text-slate-500">Standard 3,600s TTL per Zoho OAuth spec</span>
+            <div class="bg-slate-50 p-6 rounded-2xl space-y-2 border-none">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Token Lifetime &amp; Expiry</span>
+                <span class="text-2xl font-extrabold text-slate-900 block">{{ token_info.expires_in_seconds }}s remaining</span>
+                <span class="text-[11px] text-slate-500 font-bold">Standard 3,600s TTL per Zoho OAuth spec</span>
             </div>
-            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/60">
-                <span class="text-[10px] font-bold text-slate-400 uppercase block">Daily API Rate Limit Credits</span>
-                <span class="text-lg font-black text-emerald-600 block mt-1">{{ "{:,}".format(token_info.daily_credits_remaining) }} / {{ "{:,}".format(token_info.daily_credits_limit) }}</span>
-                <span class="text-[10px] text-slate-500">Resets daily at 00:00 GMT</span>
+            <div class="bg-slate-50 p-6 rounded-2xl space-y-2 border-none">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Daily API Rate Limit Credits</span>
+                <span class="text-2xl font-extrabold text-emerald-700 block">{{ "{:,}".format(token_info.daily_credits_remaining) }} / {{ "{:,}".format(token_info.daily_credits_limit) }}</span>
+                <span class="text-[11px] text-slate-500 font-bold">Resets daily at 00:00 GMT</span>
             </div>
         </div>
 
         <div class="pt-2">
-            <span class="text-[10px] font-bold text-slate-400 uppercase block mb-1.5">Authorized OAuth Scopes</span>
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Authorized OAuth Scopes</span>
             <div class="flex flex-wrap gap-2 text-xs">
                 {% for scope in token_info.scopes %}
-                <span class="bg-blue-50 text-blue-700 font-mono text-[11px] font-bold px-2.5 py-1 rounded-lg border border-blue-200/60">
+                <span class="bg-slate-100 text-slate-800 font-mono font-bold px-3 py-1 rounded-lg">
                     {{ scope }}
                 </span>
                 {% endfor %}
@@ -67,70 +70,42 @@
         </div>
     </div>
 
-    <!-- Interactive API Endpoint Tester -->
-    <div class="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/80 shadow-sm space-y-4">
-        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+    <!-- Live REST Endpoint Explorer -->
+    <div class="bg-white p-8 rounded-3xl shadow-sm border-none space-y-6">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-                <h3 class="font-black text-base text-slate-900">Zoho REST API Endpoint Simulator</h3>
-                <p class="text-xs text-slate-500">Select an API call to test headers and response envelopes</p>
+                <h3 class="font-extrabold text-lg text-slate-900">Zoho CRM &amp; Books REST API Explorer</h3>
+                <p class="text-xs text-slate-500 font-bold mt-0.5">Inspect real-time API responses, headers, and telemetry</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="/api-console?endpoint=crm_leads" class="px-4 py-2 rounded-xl text-xs font-bold transition-colors {{ 'bg-slate-900 text-white' if active_endpoint == 'crm_leads' else 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">
+                    GET /crm/v2/Leads
+                </a>
+                <a href="/api-console?endpoint=crm_deals" class="px-4 py-2 rounded-xl text-xs font-bold transition-colors {{ 'bg-slate-900 text-white' if active_endpoint == 'crm_deals' else 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">
+                    GET /crm/v2/Deals
+                </a>
+                <a href="/api-console?endpoint=books_invoices" class="px-4 py-2 rounded-xl text-xs font-bold transition-colors {{ 'bg-slate-900 text-white' if active_endpoint == 'books_invoices' else 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">
+                    GET /books/v3/invoices
+                </a>
             </div>
         </div>
 
-        <!-- Quick API Buttons -->
-        <div class="flex flex-wrap gap-2.5 text-xs">
-            <a href="/api-console?endpoint=crm_leads" class="px-3.5 py-2 rounded-xl font-bold transition-all {{ 'bg-blue-600 text-white shadow' if active_endpoint == 'crm_leads' else 'bg-slate-100 hover:bg-slate-200 text-slate-700' }}">
-                GET /crm/v2/Leads
-            </a>
-            <a href="/api-console?endpoint=crm_deals" class="px-3.5 py-2 rounded-xl font-bold transition-all {{ 'bg-blue-600 text-white shadow' if active_endpoint == 'crm_deals' else 'bg-slate-100 hover:bg-slate-200 text-slate-700' }}">
-                GET /crm/v2/Deals
-            </a>
-            <a href="/api-console?endpoint=books_invoices" class="px-3.5 py-2 rounded-xl font-bold transition-all {{ 'bg-blue-600 text-white shadow' if active_endpoint == 'books_invoices' else 'bg-slate-100 hover:bg-slate-200 text-slate-700' }}">
-                GET /books/v3/invoices
-            </a>
+        <!-- Request & Response Metadata -->
+        <div class="bg-slate-50 p-6 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 font-mono text-xs border-none">
+            <div class="flex items-center gap-3">
+                <span class="bg-emerald-600 text-white font-bold px-2.5 py-1 rounded text-[11px]">{{ api_response.status_code }} OK</span>
+                <span class="text-slate-700 font-bold">{{ api_response.url }}</span>
+            </div>
+            <div class="flex items-center gap-4 text-slate-500 font-bold text-[11px]">
+                <span>Rate Limit: {{ api_response.rate_limit_remaining }} remaining</span>
+                <span>Latency: {{ api_response.response_time_ms }} ms</span>
+            </div>
         </div>
 
-        <!-- Live cURL and Response Console -->
-        <div class="bg-slate-900 text-slate-100 rounded-2xl overflow-hidden shadow-lg border border-slate-800 text-xs font-mono">
-            
-            <!-- Terminal Header -->
-            <div class="bg-slate-950 px-4 py-2.5 flex items-center justify-between border-b border-slate-800 text-[11px] text-slate-400">
-                <div class="flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
-                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                    <span class="ml-1 text-slate-300 font-bold">{{ api_response.method }} {{ api_response.url }}</span>
-                </div>
-                <span>Status: <strong class="text-emerald-400">{{ api_response.status_code }} OK</strong> ({{ api_response.latency_ms }} ms)</span>
-            </div>
-
-            <!-- cURL snippet -->
-            <div class="p-4 bg-slate-950/60 border-b border-slate-800/80 text-slate-300 text-[11px] leading-relaxed">
-                <span class="text-slate-500 block mb-1"># Equivalent cURL Command:</span>
-                <span class="text-emerald-400">curl</span> -X {{ api_response.method }} "{{ api_response.url }}" \<br>
-                &nbsp;&nbsp;-H "Authorization: Zoho-oauthtoken {{ token_info.access_token[:25] }}..." \<br>
-                &nbsp;&nbsp;-H "Content-Type: application/json"
-            </div>
-
-            <!-- Headers & Payload Body -->
-            <div class="p-4 max-h-96 overflow-y-auto space-y-3">
-                <div>
-                    <span class="text-slate-500 text-[10px] uppercase font-bold block mb-1">Response Headers:</span>
-                    <div class="text-[11px] text-slate-400 space-y-0.5">
-                        <p>X-Rate-Limit-Limit: {{ api_response.request_headers['X-Rate-Limit-Limit'] }}</p>
-                        <p>X-Rate-Limit-Remaining: {{ api_response.request_headers['X-Rate-Limit-Remaining'] }}</p>
-                        <p>X-Rate-Limit-Reset: {{ api_response.request_headers['X-Rate-Limit-Reset'] }}s</p>
-                        <p>Content-Type: application/json;charset=UTF-8</p>
-                    </div>
-                </div>
-
-                <div>
-                    <span class="text-slate-500 text-[10px] uppercase font-bold block mb-1">Response JSON Body:</span>
-                    <pre class="text-emerald-300 text-[11px] whitespace-pre-wrap leading-relaxed">{{ api_json_pretty }}</pre>
-                </div>
-            </div>
-
+        <!-- Response Body (JSON Viewer) -->
+        <div class="bg-[#0f172a] rounded-2xl p-6 text-slate-100 overflow-x-auto code-font text-xs max-h-96 overflow-y-auto border-none">
+            <pre class="leading-relaxed">{{ api_json_pretty }}</pre>
         </div>
-
     </div>
 
 </div>

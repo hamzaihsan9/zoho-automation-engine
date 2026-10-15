@@ -1,69 +1,75 @@
 {% extends "base.html" %}
 
-{% block title %}Zoho Books Invoices | ZohoPulse{% endblock %}
+{% block title %}Zoho Books Invoices | ZohoPulse Enterprise{% endblock %}
 
 {% block content %}
 <div class="space-y-6">
 
-    <!-- Top Action Bar -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm">
+    <!-- Top Action Bar (Borderless) -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-8 rounded-3xl shadow-sm border-none">
         <div>
-            <h1 class="text-2xl font-black text-slate-900">Zoho Books Automated Invoices</h1>
-            <p class="text-xs text-slate-500 font-medium mt-0.5">
-                Generated via Deluge connector <code class="bg-slate-100 text-blue-700 font-mono px-1.5 py-0.5 rounded">zoho.books.createRecord("Invoices", orgId, invoiceMap)</code>
+            <div class="inline-flex items-center gap-2 bg-emerald-50 text-emerald-800 text-[11px] font-bold px-3 py-1 rounded-full uppercase mb-2">
+                Zoho Books Accounting Connector
+            </div>
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Automated Sales Invoices</h1>
+            <p class="text-xs text-slate-500 font-bold mt-1">
+                Automated Accounts Receivable and Billing Engine synchronized in real-time with Zoho Books
             </p>
         </div>
         <div class="flex items-center gap-2">
-            <span class="text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-xl">
-                Total Invoiced: <strong class="text-emerald-700">${{ "{:,.2f}".format(total_invoiced_val) }}</strong>
+            <span class="text-xs font-bold text-slate-700 bg-slate-100 px-4 py-2.5 rounded-2xl">
+                Total Billed: <strong class="text-emerald-700">${{ "{:,.2f}".format(total_invoiced_val) }}</strong>
             </span>
         </div>
     </div>
 
-    <!-- Invoices List -->
-    <div class="space-y-4">
+    <!-- Invoices List (Borderless, Clean Enterprise Spacing) -->
+    <div class="space-y-6">
         {% for inv in invoices %}
-        <div class="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/80 shadow-sm space-y-4">
+        <div class="bg-white p-8 rounded-3xl shadow-sm border-none space-y-6">
             
             <!-- Invoice Header Bar -->
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-4 border-b border-slate-100">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-lg">📄</div>
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-slate-100">
+                <div class="flex items-center gap-4">
+                    <!-- Invoice Document Icon -->
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </div>
                     <div>
-                        <div class="flex items-center gap-2">
-                            <h3 class="font-black text-base text-slate-900">{{ inv.invoice_number }}</h3>
-                            <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">{{ inv.status }}</span>
+                        <div class="flex items-center gap-2.5">
+                            <h3 class="font-extrabold text-lg text-slate-900">{{ inv.invoice_number }}</h3>
+                            <span class="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-3 py-0.5 rounded-full uppercase tracking-wider">{{ inv.status }}</span>
                         </div>
-                        <p class="text-xs text-slate-500 font-medium">Billed To: <strong class="text-slate-800">{{ inv.customer_name }}</strong></p>
+                        <p class="text-xs text-slate-500 font-bold mt-0.5">Billed Entity: <strong class="text-slate-800">{{ inv.customer_name }}</strong></p>
                     </div>
                 </div>
-                <div class="text-left sm:text-right text-xs">
-                    <p class="text-slate-400 font-medium">Issue Date: <strong class="text-slate-700 font-mono">{{ inv.date }}</strong></p>
-                    <p class="text-slate-400 font-medium">Due Date: <strong class="text-slate-700 font-mono">{{ inv.due_date }}</strong> (Net 15 Days)</p>
+                <div class="text-left sm:text-right text-xs space-y-0.5">
+                    <p class="text-slate-400 font-bold">Issue Date: <strong class="text-slate-700 font-mono">{{ inv.date }}</strong></p>
+                    <p class="text-slate-400 font-bold">Terms: <strong class="text-slate-700 font-mono">{{ inv.due_date }}</strong> (Net 15 Days)</p>
                 </div>
             </div>
 
-            <!-- Itemized Line Items Table -->
-            <div class="bg-slate-50 rounded-2xl p-4 overflow-x-auto text-xs">
+            <!-- Itemized Line Items Table (Borderless, Airy) -->
+            <div class="bg-[#f8fafc] rounded-2xl p-6 overflow-x-auto text-xs">
                 <table class="w-full text-left">
-                    <thead class="text-slate-400 uppercase font-bold text-[10px] border-b border-slate-200 pb-2">
+                    <thead class="text-slate-400 uppercase font-extrabold text-[10px] pb-3 border-b border-slate-200">
                         <tr>
-                            <th class="pb-2">Line Item & Description</th>
-                            <th class="pb-2 text-center">Qty</th>
-                            <th class="pb-2 text-right">Rate</th>
-                            <th class="pb-2 text-right">Amount</th>
+                            <th class="pb-3">Product / Service Description</th>
+                            <th class="pb-3 text-center">Quantity</th>
+                            <th class="pb-3 text-right">Unit Rate</th>
+                            <th class="pb-3 text-right">Total Amount</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-200/60 font-medium">
+                    <tbody class="divide-y divide-slate-200/60 font-bold text-slate-700">
                         {% for item in inv.line_items %}
                         <tr>
-                            <td class="py-2.5">
-                                <span class="font-bold text-slate-900 block">{{ item.name }}</span>
-                                <span class="text-slate-500 text-[11px]">{{ item.description }}</span>
+                            <td class="py-4">
+                                <span class="font-extrabold text-slate-900 text-sm block">{{ item.name }}</span>
+                                <span class="text-slate-500 text-xs mt-0.5 block">{{ item.description }}</span>
                             </td>
-                            <td class="py-2.5 text-center font-semibold text-slate-700">{{ item.quantity }}</td>
-                            <td class="py-2.5 text-right font-mono">${{ "{:,.2f}".format(item.rate) }}</td>
-                            <td class="py-2.5 text-right font-bold text-slate-900 font-mono">${{ "{:,.2f}".format(item.amount) }}</td>
+                            <td class="py-4 text-center font-bold">{{ item.quantity }}</td>
+                            <td class="py-4 text-right font-mono font-bold">${{ "{:,.2f}".format(item.rate) }}</td>
+                            <td class="py-4 text-right font-extrabold text-slate-900 font-mono text-sm">${{ "{:,.2f}".format(item.amount) }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -71,22 +77,26 @@
             </div>
 
             <!-- Totals & Payment Summary -->
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pt-2 gap-4">
-                <div class="text-xs text-slate-500 space-y-1">
-                    <p>🏦 Payment Mode: <strong>Bank Wire / Direct Credit (Zoho Books Gateway)</strong></p>
-                    <p class="text-[11px] text-slate-400">Linked to Zoho CRM Deal #{{ inv.deal_id }}</p>
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pt-2 gap-6">
+                <div class="text-xs text-slate-500 font-bold space-y-1">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                        <span>Settlement Method: <strong>Direct Bank Wire (Zoho Books Invoicing Gateway)</strong></span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 pl-6">Linked to Zoho CRM Opportunity #{{ inv.deal_id }}</p>
                 </div>
-                <div class="text-right text-xs space-y-1 w-full sm:w-auto">
-                    <div class="flex justify-between sm:justify-end gap-6 text-slate-500">
-                        <span>Subtotal:</span>
-                        <span class="font-mono font-bold">${{ "{:,.2f}".format(inv.subtotal) }}</span>
+                
+                <div class="text-right text-xs space-y-1.5 w-full sm:w-auto">
+                    <div class="flex justify-between sm:justify-end gap-8 text-slate-500 font-bold">
+                        <span>Services Subtotal:</span>
+                        <span class="font-mono text-slate-800">${{ "{:,.2f}".format(inv.subtotal) }}</span>
                     </div>
-                    <div class="flex justify-between sm:justify-end gap-6 text-slate-500">
-                        <span>Sales Tax (16%):</span>
-                        <span class="font-mono font-bold">${{ "{:,.2f}".format(inv.tax_amount) }}</span>
+                    <div class="flex justify-between sm:justify-end gap-8 text-slate-500 font-bold">
+                        <span>Sales Tax (16% GST):</span>
+                        <span class="font-mono text-slate-800">${{ "{:,.2f}".format(inv.tax_amount) }}</span>
                     </div>
-                    <div class="flex justify-between sm:justify-end gap-6 text-base font-black text-slate-900 border-t border-slate-200 pt-1">
-                        <span>Grand Total:</span>
+                    <div class="flex justify-between sm:justify-end gap-8 text-lg font-extrabold text-slate-900 border-t border-slate-100 pt-2">
+                        <span>Invoice Total Due:</span>
                         <span class="font-mono text-emerald-700">${{ "{:,.2f}".format(inv.total) }}</span>
                     </div>
                 </div>
@@ -94,13 +104,9 @@
 
         </div>
         {% else %}
-        <div class="bg-white p-16 rounded-3xl border border-slate-200/80 text-center shadow-sm max-w-md mx-auto">
-            <span class="text-4xl block mb-2">📄</span>
-            <h3 class="font-bold text-slate-800 text-base">No Invoices Generated Yet</h3>
-            <p class="text-xs text-slate-500 mt-1 mb-4">Advance a deal in the pipeline to "Closed Won" to trigger automatic invoice generation via Deluge.</p>
-            <a href="/deals" class="bg-slate-900 text-white font-bold px-4 py-2 rounded-xl text-xs shadow">
-                View Deals Pipeline ➔
-            </a>
+        <div class="bg-white p-16 rounded-3xl border-none text-center shadow-sm max-w-md mx-auto">
+            <h3 class="font-extrabold text-slate-800 text-base">No Invoices Provisioned Yet</h3>
+            <p class="text-xs text-slate-500 mt-1 mb-4 font-bold">Advance an opportunity in the Deals Pipeline to Closed Won to trigger automated invoice creation.</p>
         </div>
         {% endfor %}
     </div>
