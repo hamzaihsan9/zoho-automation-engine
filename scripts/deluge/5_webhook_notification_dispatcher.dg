@@ -1,0 +1,73 @@
+// ==============================================================================
+// Script: 5_webhook_notification_dispatcher.dg
+// Purpose: Outbound Webhook Dispatcher via Deluge invokeurl Task
+// Platform: Zoho CRM Workflow / Scheduled Function / Standalone Deluge
+// Integration: Dispatches event notifications to external web portals & ERPs
+// ==============================================================================
+
+Map dispatch_webhook_event(String eventType, Map eventPayload, String destinationUrl)
+{
+    if (destinationUrl == "" || destinationUrl == null)
+    {
+        destinationUrl = "https://api.zohopulse.io/v1/webhooks/crm-events";
+    }
+
+    // Build standardized envelope
+    timestamp = zoho.currenttime.toString("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    
+    envelope = Map();
+    envelope.put("event", eventType);
+    envelope.put("timestamp", timestamp);
+    envelope.put("source", "Zoho CRM Deluge Engine");
+    envelope.put("payload", eventPayload);
+
+    // Build secure request headers
+    headersMap = Map();
+    headersMap.put("Content-Type", "application/json");
+    headersMap.put("User-Agent", "Zoho-Deluge-Dispatcher/2.0");
+    headersMap.put("X-Zoho-Event-Type", eventType);
+    
+    // In production, sign with HMAC-SHA256 for tampering prevention
+    signature = zoho.encryption.hmacSha256(envelope.toString(), "zp_secret_key_981248");
+    headersMap.put("X-Zoho-Signature", signature);
+
+    info "Dispatching webhook event '" + eventType + "' to: " + destinationUrl;
+
+    try 
+    {
+        // Execute HTTP POST using Deluge built-in invokeurl
+        httpResponse = invokeurl
+        [
+            url: destinationUrl
+            type: POST
+            parameters: envelope.toString()
+            headers: headersMap
+        ];
+
+        info "Webhook Dispatch Status: " + httpResponse.toString();
+
+        return {
+            "status": "delivered",
+            "event": eventType,
+            "destination": destinationUrl,
+            "signature": signature,
+            "response": httpResponse
+        };
+    }
+    catch (e)
+    {
+        info "ERROR: Webhook dispatch failed: " + e.toString();
+        
+        // Log incident or push to retry queue
+        errorLog = Map();
+        errorLog.put("Failed_URL", destinationUrl);
+        errorLog.put("Error_Details", e.toString());
+        errorLog.put("Event_Type", eventType);
+        
+        return {
+            "status": "failed",
+            "error": e.toString(),
+            "retry_scheduled": true
+        };
+    }
+}

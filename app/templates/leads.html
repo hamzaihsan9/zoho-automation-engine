@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Leads & Deluge Scoring | ZohoPulse{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Top Action Bar -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm">
+        <div>
+            <h1 class="text-2xl font-black text-slate-900">Zoho CRM Ingested Leads</h1>
+            <p class="text-xs text-slate-500 font-medium mt-0.5">
+                Evaluated by <code class="bg-slate-100 text-blue-700 font-mono px-1.5 py-0.5 rounded">2_ai_lead_scoring_and_assignment.dg</code>
+            </p>
+        </div>
+        <button onclick="document.getElementById('ingest-lead-modal').classList.remove('hidden')" 
+                class="bg-zoho-red hover:bg-red-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow">
+            <span>+ Ingest New Lead</span>
+        </button>
+    </div>
+
+    <!-- Leads Table Card -->
+    <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider border-b border-slate-200">
+                    <tr>
+                        <th class="py-4 px-6">Lead ID & Name</th>
+                        <th class="py-4 px-6">Company & Domain</th>
+                        <th class="py-4 px-6">Annual Revenue</th>
+                        <th class="py-4 px-6">Deluge Score</th>
+                        <th class="py-4 px-6">Assigned Rep (Round-Robin)</th>
+                        <th class="py-4 px-6">Status</th>
+                        <th class="py-4 px-6 text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 font-medium">
+                    {% for lead in leads %}
+                    <tr class="hover:bg-slate-50/70 transition-colors">
+                        <td class="py-4 px-6">
+                            <span class="font-mono text-[10px] text-slate-400 block">#{{ lead.id }}</span>
+                            <span class="font-bold text-slate-900 text-sm">{{ lead.first_name }} {{ lead.last_name }}</span>
+                            <span class="text-slate-500 block text-[11px] font-mono">{{ lead.email }}</span>
+                        </td>
+                        <td class="py-4 px-6">
+                            <span class="font-bold text-slate-800">{{ lead.company }}</span>
+                            <span class="text-slate-400 block text-[11px]">{{ lead.lead_source }}</span>
+                        </td>
+                        <td class="py-4 px-6 font-bold text-slate-800">
+                            ${{ "{:,.0f}".format(lead.annual_revenue) }}
+                        </td>
+                        <td class="py-4 px-6">
+                            <div class="flex items-center gap-2">
+                                <span class="w-8 h-8 rounded-xl flex items-center justify-center font-black text-xs {{ 'bg-red-100 text-zoho-red' if lead.lead_score >= 75 else ('bg-amber-100 text-amber-800' if lead.lead_score >= 50 else 'bg-slate-100 text-slate-700') }}">
+                                    {{ lead.lead_score }}
+                                </span>
+                                <div>
+                                    <span class="font-bold text-[11px] block {{ 'text-red-700' if lead.lead_score >= 75 else ('text-amber-700' if lead.lead_score >= 50 else 'text-slate-600') }}">
+                                        {{ lead.lead_classification }}
+                                    </span>
+                                    <button onclick="alert('Score Breakdown:\n\n• {{ lead.score_breakdown|join(' \n• ') }}')" class="text-[10px] text-blue-600 underline font-semibold">
+                                        View Breakdown
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-4 px-6">
+                            <span class="font-bold text-slate-800 block">{{ lead.assigned_rep.split('(')[0] }}</span>
+                            <span class="text-[10px] text-slate-400 font-mono">{{ lead.assigned_rep.split('(')[1].replace(')', '') if '(' in lead.assigned_rep else '' }}</span>
+                        </td>
+                        <td class="py-4 px-6">
+                            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold {{ 'bg-emerald-100 text-emerald-800' if lead.lead_status == 'Converted to Deal' else ('bg-blue-100 text-blue-800' if 'SQL' in lead.lead_status else 'bg-slate-100 text-slate-700') }}">
+                                {{ lead.lead_status }}
+                            </span>
+                        </td>
+                        <td class="py-4 px-6 text-right">
+                            {% if lead.lead_status != 'Converted to Deal' %}
+                            <form action="/api/leads/{{ lead.id }}/convert" method="POST" class="inline">
+                                <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs shadow transition-transform transform hover:-translate-y-0.5">
+                                    Convert to Deal ➔
+                                </button>
+                            </form>
+                            {% else %}
+                            <span class="text-xs font-bold text-emerald-600 flex items-center justify-end gap-1">
+                                <span>Converted ✓</span>
+                            </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- Inbound Lead Ingestion Modal -->
+<div id="ingest-lead-modal" class="fixed inset-0 bg-slate-900/60 z-50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative">
+        <button onclick="document.getElementById('ingest-lead-modal').classList.add('hidden')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 bg-slate-100 p-2 rounded-full">✕</button>
+        
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-red-100 text-zoho-red flex items-center justify-center font-bold text-lg">⚡</div>
+            <div>
+                <h3 class="text-lg font-black text-slate-900">Simulate Inbound Web-to-Lead</h3>
+                <p class="text-xs text-slate-500 font-medium">Triggers Deluge Ingestion, Deduplication, and Scoring</p>
+            </div>
+        </div>
+
+        <form action="/api/leads/ingest" method="POST" class="space-y-3.5 text-xs font-semibold">
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-slate-700 mb-1">First Name *</label>
+                    <input type="text" name="first_name" required placeholder="e.g. Daniyal" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-zoho-red">
+                </div>
+                <div>
+                    <label class="block text-slate-700 mb-1">Last Name *</label>
+                    <input type="text" name="last_name" required placeholder="e.g. Sheikh" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-zoho-red">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-slate-700 mb-1">Work Email (Corporate Domain = +15 pts) *</label>
+                <input type="email" name="email" required placeholder="daniyal@enterprisesoft.pk" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-zoho-red">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-slate-700 mb-1">Phone Number</label>
+                    <input type="text" name="phone" placeholder="+92-300-1234567" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-zoho-red">
+                </div>
+                <div>
+                    <label class="block text-slate-700 mb-1">Company Name *</label>
+                    <input type="text" name="company" required placeholder="Enterprise Soft PK" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-zoho-red">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-slate-700 mb-1">Estimated Annual Revenue (USD)</label>
+                    <input type="number" name="annual_revenue" value="450000" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-zoho-red">
+                </div>
+                <div>
+                    <label class="block text-slate-700 mb-1">Lead Source</label>
+                    <select name="lead_source" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-white">
+                        <option value="Direct Demo Request">Direct Demo Request (High Intent)</option>
+                        <option value="Inbound Webhook">Inbound Webhook</option>
+                        <option value="Organic Search">Organic Search</option>
+                        <option value="Partner Referral">Partner Referral</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" class="w-full py-3 bg-zoho-red hover:bg-red-700 text-white font-bold rounded-xl shadow-lg mt-2 transition-transform transform hover:-translate-y-0.5">
+                Run Deluge Ingestion & Calculate Score ➔
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

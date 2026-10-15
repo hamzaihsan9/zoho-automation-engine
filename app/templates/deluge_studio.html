@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}Deluge Studio & Code Inspector | ZohoPulse{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Top Action Bar -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm">
+        <div>
+            <div class="inline-flex items-center gap-2 bg-red-50 text-zoho-red border border-red-200 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase mb-1">
+                Zoho Cloud Scripting Language
+            </div>
+            <h1 class="text-2xl font-black text-slate-900">Deluge Script Studio & Code Inspector</h1>
+            <p class="text-xs text-slate-500 font-medium">
+                Production-grade Deluge automation scripts implementing enterprise Lead-to-Cash workflows in Zoho CRM & Books.
+            </p>
+        </div>
+        <div class="flex items-center gap-2 text-xs font-semibold text-slate-600 bg-slate-100 px-3 py-2 rounded-xl">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span>Deluge 2.0 Syntax Compliant</span>
+        </div>
+    </div>
+
+    <!-- Script Navigation Tabs -->
+    <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+        {% for s in scripts %}
+        <a href="/deluge-studio?script={{ s.filename }}" 
+           class="px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all shadow-sm flex items-center gap-2 {{ 'bg-slate-900 text-white' if current_script.filename == s.filename else 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200' }}">
+            <span>⚡</span>
+            <span>{{ s.filename }}</span>
+        </a>
+        {% endfor %}
+    </div>
+
+    <!-- Code Inspector & Execution Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Left: Code Viewer with Line Numbers -->
+        <div class="lg:col-span-8 bg-slate-900 text-slate-100 rounded-3xl overflow-hidden shadow-xl border border-slate-800">
+            
+            <!-- Code Header -->
+            <div class="bg-slate-950 px-6 py-4 flex items-center justify-between border-b border-slate-800 text-xs">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                    <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+                    <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                    <span class="font-mono font-bold text-slate-300 ml-2">{{ current_script.filename }}</span>
+                </div>
+                <span class="text-slate-400 font-mono text-[11px]">{{ current_script.lines|length }} Lines • Deluge</span>
+            </div>
+
+            <!-- Code Content -->
+            <div class="p-6 overflow-x-auto code-block text-xs leading-relaxed max-h-[580px] overflow-y-auto">
+                <table class="w-full">
+                    <tbody>
+                        {% for line in current_script.lines %}
+                        <tr class="hover:bg-slate-800/40">
+                            <td class="text-slate-600 select-none pr-4 text-right font-mono text-[11px] w-8 align-top">{{ loop.index }}</td>
+                            <td class="text-slate-200 font-mono whitespace-pre">{{ line }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Code Footer Bar -->
+            <div class="bg-slate-950 px-6 py-3 border-t border-slate-800 flex justify-between items-center text-[11px] text-slate-400 font-mono">
+                <span>Zoho API Scopes: ZohoCRM.modules.ALL, ZohoBooks.fullaccess.ALL</span>
+                <span>UTF-8</span>
+            </div>
+        </div>
+
+        <!-- Right: Script Architecture & Execution Sandbox -->
+        <div class="lg:col-span-4 space-y-6">
+            
+            <!-- Script Architecture Breakdown -->
+            <div class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-4">
+                <div class="flex items-center gap-2">
+                    <span class="text-lg">📘</span>
+                    <h3 class="font-black text-sm text-slate-900">Script Architecture & Role</h3>
+                </div>
+
+                <div class="space-y-3 text-xs">
+                    <div>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase block">Function Purpose</span>
+                        <p class="font-semibold text-slate-800 mt-0.5">{{ current_script.purpose }}</p>
+                    </div>
+
+                    <div>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase block">Trigger Location in Zoho</span>
+                        <p class="font-semibold text-slate-800 mt-0.5">{{ current_script.trigger }}</p>
+                    </div>
+
+                    <div>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase block">Zoho Built-in Tasks Used</span>
+                        <div class="flex flex-wrap gap-1.5 mt-1">
+                            {% for task in current_script.tasks_used %}
+                            <span class="bg-slate-100 text-blue-700 font-mono text-[11px] px-2 py-0.5 rounded font-bold">
+                                {{ task }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Deluge Sandbox Runner -->
+            <div class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg">🧪</span>
+                        <h3 class="font-black text-sm text-slate-900">Sandbox Test Runner</h3>
+                    </div>
+                    <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Interactive</span>
+                </div>
+
+                <p class="text-xs text-slate-500 font-medium">
+                    Trigger a simulated test run of this Deluge function against sandbox data to inspect evaluation logs and latency.
+                </p>
+
+                <form action="/api/deluge/test-run" method="POST" class="space-y-3">
+                    <input type="hidden" name="script_filename" value="{{ current_script.filename }}">
+                    
+                    <button type="submit" class="w-full bg-zoho-red hover:bg-red-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition-transform transform hover:-translate-y-0.5 text-xs flex items-center justify-center gap-2">
+                        <span>Execute Script in Deluge Sandbox</span>
+                        <span>⚡</span>
+                    </button>
+                </form>
+
+                {% if test_result %}
+                <div class="bg-slate-900 text-slate-200 p-4 rounded-2xl text-xs font-mono space-y-2">
+                    <div class="flex items-center justify-between text-[11px] text-emerald-400 pb-1 border-b border-slate-800">
+                        <span>Status: {{ test_result.status }}</span>
+                        <span>{{ test_result.execution_time_ms }} ms</span>
+                    </div>
+                    <div class="space-y-1 text-[11px] max-h-36 overflow-y-auto">
+                        {% for log in test_result.logs %}
+                        <p class="text-slate-300">{{ log }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

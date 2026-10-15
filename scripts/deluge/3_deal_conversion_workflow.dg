@@ -1,0 +1,92 @@
+// ==============================================================================
+// Script: 3_deal_conversion_workflow.dg
+// Purpose: Automated Lead-to-Deal Conversion Workflow in Zoho CRM
+// Platform: Zoho CRM Blueprint Transition / Workflow Action
+// Trigger: Lead Status set to "Qualified / Convert to Deal"
+// ==============================================================================
+
+Map convert_lead_to_deal(Map params)
+{
+    leadId = params.get("lead_id");
+    dealAmount = ifnull(params.get("deal_amount"), 15000).toDecimal();
+    closingDays = ifnull(params.get("closing_days"), 30).toLong();
+
+    leadRecord = zoho.crm.getRecordById("Leads", leadId);
+    if (leadRecord == null || leadRecord.get("id") == null)
+    {
+        return {"status": "error", "message": "Lead record not found."};
+    }
+
+    company = ifnull(leadRecord.get("Company"), "Client Enterprise");
+    firstName = ifnull(leadRecord.get("First_Name"), "");
+    lastName = ifnull(leadRecord.get("Last_Name"), "Lead Contact");
+    email = ifnull(leadRecord.get("Email"), "");
+    phone = ifnull(leadRecord.get("Phone"), "");
+    ownerId = ifnull(leadRecord.get("Owner"), {}).get("id");
+
+    info "Converting Lead: " + firstName + " " + lastName + " from " + company;
+
+    // Step 1: Create or Match Account in Zoho CRM
+    searchAccount = zoho.crm.searchRecords("Accounts", "(Account_Name:equals:" + company + ")");
+    accountId = "";
+    if (searchAccount.size() > 0)
+    {
+        accountId = searchAccount.get(0).get("id");
+        info "Existing Account matched: " + accountId;
+    }
+    else
+    {
+        accountMap = Map();
+        accountMap.put("Account_Name", company);
+        accountMap.put("Phone", phone);
+        accountMap.put("Owner", ownerId);
+        accountCreate = zoho.crm.createRecord("Accounts", accountMap);
+        accountId = accountCreate.get("id");
+        info "New Account created: " + accountId;
+    }
+
+    // Step 2: Create Contact linked to Account
+    contactMap = Map();
+    contactMap.put("First_Name", firstName);
+    contactMap.put("Last_Name", lastName);
+    contactMap.put("Email", email);
+    contactMap.put("Phone", phone);
+    contactMap.put("Account_Name", accountId);
+    contactMap.put("Owner", ownerId);
+    contactCreate = zoho.crm.createRecord("Contacts", contactMap);
+    contactId = contactCreate.get("id");
+    info "Contact created: " + contactId;
+
+    // Step 3: Create Opportunity / Deal in Zoho CRM
+    dealCloseDate = zoho.currentdate.addDay(closingDays).toString("yyyy-MM-dd");
+
+    dealMap = Map();
+    dealMap.put("Deal_Name", company + " - ZohoPulse SaaS License");
+    dealMap.put("Account_Name", accountId);
+    dealMap.put("Contact_Name", contactId);
+    dealMap.put("Amount", dealAmount);
+    dealMap.put("Stage", "Proposal / Value Proposition");
+    dealMap.put("Probability", 40);
+    dealMap.put("Closing_Date", dealCloseDate);
+    dealMap.put("Owner", ownerId);
+    dealMap.put("Lead_Source", leadRecord.get("Lead_Source"));
+
+    dealCreate = zoho.crm.createRecord("Deals", dealMap);
+    dealId = dealCreate.get("id");
+    info "Opportunity / Deal created: " + dealId;
+
+    // Step 4: Update Lead Status to "Converted"
+    updateLead = Map();
+    updateLead.put("Lead_Status", "Converted to Deal");
+    zoho.crm.updateRecord("Leads", leadId, updateLead);
+
+    return {
+        "status": "success",
+        "account_id": accountId,
+        "contact_id": contactId,
+        "deal_id": dealId,
+        "deal_name": dealMap.get("Deal_Name"),
+        "amount": dealAmount,
+        "stage": "Proposal / Value Proposition"
+    };
+}

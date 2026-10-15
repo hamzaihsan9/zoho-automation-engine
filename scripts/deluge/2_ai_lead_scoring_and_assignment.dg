@@ -1,0 +1,127 @@
+// ==============================================================================
+// Script: 2_ai_lead_scoring_and_assignment.dg
+// Purpose: Multi-Factor Lead Scoring & Round-Robin Sales Representative Assignment
+// Platform: Zoho CRM Workflow Rule / Custom Function
+// Trigger: On Lead Creation or Status Modification
+// ==============================================================================
+
+Map ai_lead_scoring_and_assignment(Map params)
+{
+    leadId = params.get("lead_id");
+    leadRecord = zoho.crm.getRecordById("Leads", leadId);
+    
+    if (leadRecord == null || leadRecord.get("id") == null)
+    {
+        return {"status": "error", "message": "Lead not found for ID: " + leadId};
+    }
+
+    // Extract attributes for scoring
+    annualRevenue = ifnull(leadRecord.get("Annual_Revenue"), 0).toDecimal();
+    leadSource = ifnull(leadRecord.get("Lead_Source"), "");
+    email = ifnull(leadRecord.get("Email"), "");
+    phone = ifnull(leadRecord.get("Phone"), "");
+    company = ifnull(leadRecord.get("Company"), "");
+
+    score = 0;
+    scoringBreakdown = List();
+
+    // Factor 1: Revenue Scale
+    if (annualRevenue >= 1000000)
+    {
+        score = score + 40;
+        scoringBreakdown.add("Enterprise Budget Tier: +40 pts");
+    }
+    else if (annualRevenue >= 250000)
+    {
+        score = score + 25;
+        scoringBreakdown.add("Mid-Market Tier: +25 pts");
+    }
+    else if (annualRevenue >= 50000)
+    {
+        score = score + 15;
+        scoringBreakdown.add("Growth Tier: +15 pts");
+    }
+    else
+    {
+        score = score + 5;
+        scoringBreakdown.add("Entry Tier: +5 pts");
+    }
+
+    // Factor 2: Contact Completeness
+    if (email != "" && phone != "")
+    {
+        score = score + 20;
+        scoringBreakdown.add("Complete Contact (Email + Phone): +20 pts");
+    }
+    else if (email != "")
+    {
+        score = score + 10;
+        scoringBreakdown.add("Email Only: +10 pts");
+    }
+
+    // Factor 3: High-Intent Lead Channel
+    if (leadSource == "Direct Demo Request" || leadSource == "Inbound Webhook")
+    {
+        score = score + 25;
+        scoringBreakdown.add("High Intent Channel: +25 pts");
+    }
+    else if (leadSource == "Organic Search")
+    {
+        score = score + 15;
+        scoringBreakdown.add("Inbound Organic: +15 pts");
+    }
+    else
+    {
+        score = score + 5;
+        scoringBreakdown.add("Standard Channel: +5 pts");
+    }
+
+    // Factor 4: Corporate Domain Legitimacy (Non-generic email domain)
+    if (!email.contains("@gmail.") && !email.contains("@yahoo.") && !email.contains("@hotmail."))
+    {
+        score = score + 15;
+        scoringBreakdown.add("Verified Corporate Email Domain: +15 pts");
+    }
+
+    // Determine Classification
+    classification = "Cold";
+    if (score >= 75)
+    {
+        classification = "Hot (High Priority)";
+    }
+    else if (score >= 50)
+    {
+        classification = "Warm (Nurture)";
+    }
+
+    // Step 2: Round-Robin Sales Representative Assignment
+    salesTeam = List();
+    salesTeam.add({"name": "Hamza Ihsan (Account Executive)", "id": "481029000018271001", "email": "hamza@zohopulse.io"});
+    salesTeam.add({"name": "Sarah Chen (Enterprise Rep)", "id": "481029000018271002", "email": "sarah@zohopulse.io"});
+    salesTeam.add({"name": "Tariq Mehmood (Mid-Market Specialist)", "id": "481029000018271003", "email": "tariq@zohopulse.io"});
+
+    // Distribute by modulo of lead ID hash or sequence
+    assignedIndex = (leadId.toLong() % salesTeam.size()).toLong();
+    assignedRep = salesTeam.get(assignedIndex);
+
+    // Step 3: Update Zoho CRM Lead record
+    updateLead = Map();
+    updateLead.put("Lead_Score", score);
+    updateLead.put("Lead_Classification", classification);
+    updateLead.put("Owner", assignedRep.get("id"));
+    updateLead.put("Lead_Status", score >= 75 ? "Sales Qualified (SQL)" : "Marketing Qualified (MQL)");
+    updateLead.put("Score_Summary", scoringBreakdown.toString());
+
+    zoho.crm.updateRecord("Leads", leadId, updateLead);
+
+    info "Lead " + leadId + " assigned to " + assignedRep.get("name") + " with Score: " + score;
+
+    return {
+        "status": "success",
+        "lead_id": leadId,
+        "score": score,
+        "classification": classification,
+        "assigned_rep": assignedRep.get("name"),
+        "breakdown": scoringBreakdown
+    };
+}

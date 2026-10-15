@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ZohoPulse - Intelligent Zoho CRM & Deluge Automation Suite{% endblock %}</title>
+    
+    <!-- Fonts: Inter & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        zoho: {
+                            red: '#e42528',
+                            blue: '#1976d2',
+                            green: '#2e7d32',
+                            yellow: '#fbc02d',
+                            dark: '#0f172a',
+                            navy: '#1e293b'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        .code-block {
+            font-family: 'JetBrains Mono', monospace;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col font-sans antialiased text-slate-800 bg-[#f8fafc]">
+
+    <!-- Top Zoho Ecosystem Navigation Bar -->
+    <header class="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-18 py-3">
+                
+                <!-- Brand Logo & Badge -->
+                <div class="flex items-center gap-3">
+                    <a href="/" class="flex items-center gap-2.5 group">
+                        <!-- Zoho Multi-Color Square Emblem -->
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-zoho-red via-zoho-blue to-zoho-green p-0.5 shadow-md flex items-center justify-center">
+                            <div class="w-full h-full bg-slate-900 rounded-[10px] flex items-center justify-center text-white font-black text-lg">
+                                ZP
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xl font-black text-slate-900 tracking-tight">Zoho<span class="text-zoho-red">Pulse</span></span>
+                                <span class="bg-red-50 text-zoho-red border border-red-200 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase">CRM & Books Engine</span>
+                            </div>
+                            <p class="text-[11px] font-semibold text-slate-500">Deluge Automation • REST API v2 • Lead-to-Cash</p>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Navigation Tabs -->
+                <nav class="hidden md:flex items-center space-x-1 font-semibold text-sm">
+                    <a href="/" class="px-3 py-2 rounded-xl transition-colors {{ 'bg-slate-100 text-slate-900 font-bold' if active_tab == 'dashboard' else 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                        📊 Executive Dashboard
+                    </a>
+                    <a href="/leads" class="px-3 py-2 rounded-xl transition-colors {{ 'bg-slate-100 text-slate-900 font-bold' if active_tab == 'leads' else 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                        👥 Leads & Scoring
+                    </a>
+                    <a href="/deals" class="px-3 py-2 rounded-xl transition-colors {{ 'bg-slate-100 text-slate-900 font-bold' if active_tab == 'deals' else 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                        💼 Deals Pipeline
+                    </a>
+                    <a href="/invoices" class="px-3 py-2 rounded-xl transition-colors {{ 'bg-slate-100 text-slate-900 font-bold' if active_tab == 'invoices' else 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                        📄 Zoho Books Invoices
+                    </a>
+                    <a href="/deluge-studio" class="px-3 py-2 rounded-xl transition-colors {{ 'bg-slate-100 text-slate-900 font-bold' if active_tab == 'deluge' else 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                        ⚡ Deluge Studio
+                    </a>
+                    <a href="/api-console" class="px-3 py-2 rounded-xl transition-colors {{ 'bg-slate-100 text-slate-900 font-bold' if active_tab == 'api' else 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                        🔌 API Console
+                    </a>
+                    <a href="/interview-guide" class="px-3 py-2 rounded-xl transition-colors bg-amber-50 text-amber-900 border border-amber-200 hover:bg-amber-100 font-bold">
+                        🎯 Interview Q&A
+                    </a>
+                </nav>
+
+                <!-- Token & Rate Limit Indicator -->
+                <div class="hidden lg:flex items-center gap-3">
+                    <div class="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-700">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span>OAuth 2.0: <strong class="text-slate-900">Valid (49,858 credits)</strong></span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Body Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer with Architectural Credits -->
+    <footer class="bg-white border-t border-slate-200 py-6 text-xs text-slate-500 font-medium">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-zoho-red"></span>
+                <span><strong>ZohoPulse CRM Automation Engine</strong> • Built with Python, FastAPI, and Zoho Deluge</span>
+            </div>
+            <div class="flex items-center space-x-6 text-slate-600">
+                <span>Zoho CRM v2 API</span>
+                <span>•</span>
+                <span>Zoho Books v3 API</span>
+                <span>•</span>
+                <span>Deluge 2.0 Webhook Dispatcher</span>
+            </div>
+        </div>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

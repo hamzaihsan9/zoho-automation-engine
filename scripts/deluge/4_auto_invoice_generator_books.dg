@@ -1,0 +1,104 @@
+// ==============================================================================
+// Script: 4_auto_invoice_generator_books.dg
+// Purpose: Automated Deal-to-Invoice Generation in Zoho Books from Zoho CRM
+// Platform: Zoho CRM Workflow triggered on Deal Stage "Closed Won"
+// Integration: Zoho CRM -> Zoho Books Connector
+// ==============================================================================
+
+Map auto_invoice_generator_books(Map params)
+{
+    dealId = params.get("deal_id");
+    organizationId = ifnull(params.get("zoho_books_org_id"), "810294821");
+
+    dealRecord = zoho.crm.getRecordById("Deals", dealId);
+    if (dealRecord == null || dealRecord.get("id") == null)
+    {
+        return {"status": "error", "message": "Deal record not found for ID: " + dealId};
+    }
+
+    dealStage = dealRecord.get("Stage");
+    dealAmount = ifnull(dealRecord.get("Amount"), 0).toDecimal();
+    dealName = ifnull(dealRecord.get("Deal_Name"), "Enterprise Service");
+    
+    // Safety verification: only execute on won deals
+    if (dealStage != "Closed Won")
+    {
+        info "Deal stage is " + dealStage + ". Invoice generation bypassed.";
+        return {"status": "skipped", "reason": "Stage is not Closed Won."};
+    }
+
+    // Retrieve associated Account and Contact
+    accountId = ifnull(dealRecord.get("Account_Name"), {}).get("id");
+    contactId = ifnull(dealRecord.get("Contact_Name"), {}).get("id");
+
+    accountRecord = zoho.crm.getRecordById("Accounts", accountId);
+    contactRecord = zoho.crm.getRecordById("Contacts", contactId);
+
+    customerName = ifnull(accountRecord.get("Account_Name"), "Direct Corporate Client");
+    customerEmail = ifnull(contactRecord.get("Email"), "billing@client.com");
+
+    // Construct Zoho Books Invoice Object
+    invoiceMap = Map();
+    invoiceMap.put("customer_name", customerName);
+    invoiceMap.put("date", zoho.currentdate.toString("yyyy-MM-dd"));
+    invoiceMap.put("due_date", zoho.currentdate.addDay(15).toString("yyyy-MM-dd"));
+    invoiceMap.put("reference_number", "ZP-DEAL-" + dealId);
+    invoiceMap.put("is_inclusive_tax", false);
+
+    // Line items array
+    lineItems = List();
+    
+    // Core SaaS Subscription Line
+    subItem = Map();
+    subItem.put("name", dealName);
+    subItem.put("description", "Annual SaaS Platform License & Support SLA");
+    subItem.put("rate", dealAmount * 0.85);
+    subItem.put("quantity", 1);
+    lineItems.add(subItem);
+
+    // Implementation & Onboarding Line
+    setupItem = Map();
+    setupItem.put("name", "Enterprise Setup & Onboarding");
+    setupItem.put("description", "Dedicated solutions architect & CRM sync deployment");
+    setupItem.put("rate", dealAmount * 0.15);
+    setupItem.put("quantity", 1);
+    lineItems.add(setupItem);
+
+    invoiceMap.put("line_items", lineItems);
+    invoiceMap.put("notes", "Thank you for partnering with ZohoPulse. Please remit payment within 15 days.");
+    invoiceMap.put("terms", "Net 15 Days. Standard SaaS Terms and SLA apply.");
+
+    // Invoke Zoho Books Built-in Task to create invoice
+    invoiceResponse = zoho.books.createRecord("Invoices", organizationId, invoiceMap);
+    info "Zoho Books API Response: " + invoiceResponse.toString();
+
+    invoiceId = "";
+    invoiceNumber = "";
+    if (invoiceResponse.get("code") == 0)
+    {
+        invoiceData = invoiceResponse.get("invoice");
+        invoiceId = invoiceData.get("invoice_id");
+        invoiceNumber = invoiceData.get("invoice_number");
+
+        // Backlink invoice reference to Zoho CRM Deal
+        crmUpdate = Map();
+        crmUpdate.put("Zoho_Books_Invoice_ID", invoiceId);
+        crmUpdate.put("Zoho_Books_Invoice_Number", invoiceNumber);
+        crmUpdate.put("Invoice_Status", "Generated & Sent");
+        zoho.crm.updateRecord("Deals", dealId, crmUpdate);
+
+        // Optional: Email PDF invoice to customer via Books API
+        emailParams = Map();
+        emailParams.put("send_from_org_email", true);
+        zoho.books.sendEmail("Invoices", organizationId, invoiceId, emailParams);
+    }
+
+    return {
+        "status": "success",
+        "deal_id": dealId,
+        "invoice_id": invoiceId,
+        "invoice_number": invoiceNumber,
+        "total_amount": dealAmount,
+        "customer": customerName
+    };
+}

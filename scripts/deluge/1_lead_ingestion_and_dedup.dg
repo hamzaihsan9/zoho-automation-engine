@@ -1,0 +1,85 @@
+// ==============================================================================
+// Script: 1_lead_ingestion_and_dedup.dg
+// Purpose: Web-to-Lead Ingestion, Deduplication, and Normalization
+// Platform: Zoho CRM Custom Function / Webhook Handler
+// Trigger: Inbound API Webhook or Lead Form Submission
+// ==============================================================================
+
+void lead_ingestion_and_dedup(Map leadPayload)
+{
+    // Extract primary attributes
+    email = ifnull(leadPayload.get("email"), "").trim().toLowerCase();
+    phone = ifnull(leadPayload.get("phone"), "").trim();
+    firstName = ifnull(leadPayload.get("first_name"), "");
+    lastName = ifnull(leadPayload.get("last_name"), "Valued Prospect");
+    company = ifnull(leadPayload.get("company"), "Independent");
+    leadSource = ifnull(leadPayload.get("lead_source"), "ZohoPulse Web Portal");
+    annualRevenue = ifnull(leadPayload.get("annual_revenue"), 0).toDecimal();
+
+    info "Starting Ingestion for Lead: " + email;
+
+    if (email == "")
+    {
+        info "ERROR: Missing mandatory Email field for deduplication.";
+        return;
+    }
+
+    // Step 1: Search for existing lead by Email in Zoho CRM
+    searchCriteria = "(Email:equals:" + email + ")";
+    existingLeads = zoho.crm.searchRecords("Leads", searchCriteria);
+
+    leadId = "";
+    isUpdate = false;
+
+    if (existingLeads.size() > 0)
+    {
+        // Duplicate found: update the existing lead rather than creating a clutter record
+        existingRecord = existingLeads.get(0);
+        leadId = existingRecord.get("id");
+        isUpdate = true;
+        info "Duplicate Lead Found with ID: " + leadId + ". Performing update.";
+        
+        updateMap = Map();
+        updateMap.put("Company", company);
+        if (phone != "")
+        {
+            updateMap.put("Phone", phone);
+        }
+        updateMap.put("Last_Activity_Time", zoho.currenttime.toString("yyyy-MM-dd'T'HH:mm:ssXXX"));
+        updateMap.put("Description", "Updated via ZohoPulse Portal. Inbound payload: " + leadPayload.toString());
+        
+        updateResponse = zoho.crm.updateRecord("Leads", leadId, updateMap);
+        info "Update Response: " + updateResponse.toString();
+    }
+    else
+    {
+        // Step 2: Construct new lead map
+        createMap = Map();
+        createMap.put("First_Name", firstName);
+        createMap.put("Last_Name", lastName);
+        createMap.put("Email", email);
+        createMap.put("Phone", phone);
+        createMap.put("Company", company);
+        createMap.put("Lead_Source", leadSource);
+        createMap.put("Annual_Revenue", annualRevenue);
+        createMap.put("Lead_Status", "New / Unassigned");
+        createMap.put("Created_Source", "ZohoPulse API Engine");
+
+        // Insert new record in Zoho CRM Leads Module
+        createResponse = zoho.crm.createRecord("Leads", createMap);
+        leadId = createResponse.get("id");
+        info "New Lead Created with ID: " + leadId;
+    }
+
+    // Step 3: Trigger downstream scoring & round-robin assignment
+    if (leadId != "")
+    {
+        scoringParams = Map();
+        scoringParams.put("lead_id", leadId);
+        scoringParams.put("annual_revenue", annualRevenue);
+        scoringParams.put("company", company);
+        
+        // Execute automation module for scoring
+        thisapp.crm.ai_lead_scoring_and_assignment(scoringParams);
+    }
+}
