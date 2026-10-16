@@ -28,6 +28,7 @@ app = FastAPI(
 )
 
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
+app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
 
 # Deluge Scripts Catalog Metadata
 DELUGE_CATALOG = [

@@ -29,7 +29,7 @@
         <div class="bg-white p-8 rounded-3xl shadow-sm border-none space-y-6">
             
             <!-- Invoice Header Bar -->
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-slate-100">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4">
                 <div class="flex items-center gap-4">
                     <!-- Invoice Document Icon -->
                     <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
@@ -52,7 +52,7 @@
             <!-- Itemized Line Items Table (Borderless, Airy) -->
             <div class="bg-[#f8fafc] rounded-2xl p-6 overflow-x-auto text-xs">
                 <table class="w-full text-left">
-                    <thead class="text-slate-400 uppercase font-extrabold text-[10px] pb-3 border-b border-slate-200">
+                    <thead class="text-slate-400 uppercase font-extrabold text-[10px]">
                         <tr>
                             <th class="pb-3">Product / Service Description</th>
                             <th class="pb-3 text-center">Quantity</th>
@@ -95,7 +95,7 @@
                         <span>Sales Tax (16% GST):</span>
                         <span class="font-mono text-slate-800">${{ "{:,.2f}".format(inv.tax_amount) }}</span>
                     </div>
-                    <div class="flex justify-between sm:justify-end gap-8 text-lg font-extrabold text-slate-900 border-t border-slate-100 pt-2">
+                    <div class="flex justify-between sm:justify-end gap-8 text-lg font-extrabold text-slate-900 pt-3">
                         <span>Invoice Total Due:</span>
                         <span class="font-mono text-emerald-700">${{ "{:,.2f}".format(inv.total) }}</span>
                     </div>
